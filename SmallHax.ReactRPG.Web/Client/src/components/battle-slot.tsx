@@ -14,14 +14,14 @@ export interface BattleSlotProps {
 
 export function BattleSlot({actor, team, selected, onClick}: BattleSlotProps) {
     const orientation = team === BattleTeam.Enemy ? BattleActorOrientation.Front : BattleActorOrientation.Back;
-    const handleClick = () => {
+    const handleActorClick = () => {
         if (!actor){
             return;
         }
         onClick?.(actor);
     }
-    return <div className="battle-slot" onClick={handleClick}>
+    return <div className="battle-slot">
         {actor && actor?.hp > 0 && <BattleActorStatusBar actor={actor} team={team}/> }
-        {actor && <BattleActor actor={actor} orientation={orientation} selected={selected}/>}
+        {actor && <BattleActor actor={actor} orientation={orientation} selected={selected} onClick={handleActorClick}/>}
     </div>
 }

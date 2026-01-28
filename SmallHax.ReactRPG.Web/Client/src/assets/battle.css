@@ -14,10 +14,12 @@
     --battle-slot-margin: 50px;
     --battle-actor-size: 256px;
     --battle-actor-selected-color: lime;
+    --battle-actor-click-area-offset: 20px;
 }
 
 .battle-row {
     position: absolute;
+    pointer-events: none;
 }
 
 .battle-row.player {
@@ -97,6 +99,20 @@
     border-radius: calc(var(--battle-slot-width) / 2);
     transform: scaleY(50%) translate(-50%, 50%);
     z-index: -1;
+}
+
+.battle-actor .click-area {
+    --battle-actor-click-area-width: calc(var(--battle-slot-width) - var(--battle-actor-click-area-offset) * 2);
+    position:absolute;
+    bottom: var(--battle-actor-click-area-offset);
+    left: 50%;
+    /*border: 1px solid purple;*/
+    width: var(--battle-actor-click-area-width);
+    height: calc(var(--battle-slot-height) - var(--battle-actor-click-area-offset) * 2);
+    border-radius: calc(var(--battle-actor-click-area-width) / 2);
+    transform: translateX(-50%);
+    pointer-events: auto;
+    z-index: 1000;
 }
 
 .battle-skills {
