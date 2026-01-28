@@ -1,0 +1,161 @@
+.battle {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    --battle-skill-width: 128px;
+    --battle-skill-height: var(--battle-skill-width);
+    --battle-skill-offset-left: 8px;
+    --battle-skill-offset-top: var(--battle-skill-offset-left);
+    --battle-slot-width: 150px;
+    --battle-slot-height: 275px;
+    --battle-slot-margin: 50px;
+    --battle-actor-size: 256px;
+    --battle-actor-selected-color: lime;
+}
+
+.battle-row {
+    position: absolute;
+}
+
+.battle-row.player {
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.battle-row.enemy {
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    --battle-actor-selected-color: red;
+}
+
+.battle-slot {
+    display: inline-block;
+    width: var(--battle-slot-width);
+    height: var(--battle-slot-height);
+    margin-right: var(--battle-slot-margin);
+    position: relative;
+}
+
+.battle-actor-status-bar {
+    z-index: 1;
+    position: relative;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.hp.progress-bar {
+    border: 2px solid black;
+    background: #00000077;
+    height: 16px;
+    width: 100%;
+}
+
+    .hp.progress-bar .progress-bar-fill {
+        height: 100%;
+    }
+
+    .enemy.hp.progress-bar .progress-bar-fill {
+        background: red;
+    }
+
+    .player.hp.progress-bar .progress-bar-fill {
+        background: green;
+    }
+
+.battle-actor {
+    position:absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.battle-actor.selected .battle-actor-shadow {
+    border: solid 3px var(--battle-actor-selected-color);
+}
+
+.battle-actor-sprite {
+    max-height: var(--battle-actor-size);
+}
+
+.battle-actor-shadow {
+    position:absolute;
+    bottom: 0;
+    left: 50%;
+    width: var(--battle-slot-width);
+    height: var(--battle-slot-width);
+    background: radial-gradient(
+        #000000ff,
+        #00000060 50%,
+        #00000000
+    );
+    border-radius: calc(var(--battle-slot-width) / 2);
+    transform: scaleY(50%) translate(-50%, 50%);
+    z-index: -1;
+}
+
+.battle-skills {
+    position:absolute;
+    bottom:calc(var(--battle-skill-height) / 2);
+    right:calc(var(--battle-skill-width) / 2);
+}
+
+.battle-skill {
+    display: inline-block;
+    width: var(--battle-skill-width);
+    height: var(--battle-skill-height);
+    position: relative;
+}
+
+    .battle-skill.disabled {
+        filter: grayscale(100%);
+    }
+
+    .battle-skill.selected .battle-skill-frame {
+        filter: hue-rotate(90deg);
+    }
+
+
+    .battle-skill.selected .battle-skill-icon {
+        box-shadow: 0 0 10px 10px lime;
+    }
+
+.battle-skill-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--battle-skill-width);
+    height: var(--battle-skill-height);
+    background-image: url(/public/content/ui/skill_ring.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.battle-skill-icon {
+    position: absolute;
+    top: var(--battle-skill-offset-top);
+    left: var(--battle-skill-offset-left);
+    width: calc(var(--battle-skill-width) - var(--battle-skill-offset-left) * 2);
+    height: calc(var(--battle-skill-height) - var(--battle-skill-offset-top) * 2);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: calc(20px + var(--battle-skill-width) / 2) calc(20px + var(--battle-skill-height) / 2);
+}
+
+.battle-skill-cooldown{
+    font-size: calc(var(--battle-skill-height) / 2);
+    font-family: sans-serif;
+    color: white;
+    text-shadow: 0 0 10px black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

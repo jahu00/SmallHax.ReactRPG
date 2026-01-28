@@ -1,0 +1,101 @@
+import React, { useEffect } from "react";
+import "../assets/battle.css"
+import { BattleSkill } from "./battle-skill";
+import { BattleData } from "../types/battle-data";
+import { BattleTeam } from "../types/battle-team";
+import { BattleRow } from "./battle-row";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
+import { BattleActorState } from "../types/battle-actor-state";
+import { BattlePhase } from "../types/battle-phase";
+import { getEnemySkillUse, processActorSkill, processTurn, progressRound, selectSkill } from "../store/battle-slice";
+import { BattleSkillState } from "../types/battle-skill-state";
+import { BattleSkillTargetType } from "../types/battle-skill-target-type";
+
+export interface BattleProps {
+    battle: BattleData
+}
+
+export function Battle(){
+    const dispatch = useDispatch();
+    const phase = useSelector((state: RootState) => state.battle.phase);
+    const actors = useSelector((state: RootState) => state.battle.actors);
+    const turn = useSelector((state: RootState) => state.battle.turn);
+    const turnOrder = useSelector((state: RootState) => state.battle.turnOrder);
+    const background = useSelector((state: RootState) => state.battle.background);
+    const currentActorId = useSelector((state: RootState) => state.battle.currentActorId);
+    const selectedSkillId = useSelector((state: RootState) => state.battle.selectedSkillId);
+    const enemyTeam = actors.filter(x => x.team === BattleTeam.Enemy);
+    const playerTeam = actors.filter(x => x.team === BattleTeam.Player);
+    const currentActor = actors.length && currentActorId !== null ? actors[currentActorId]: null;
+    const selectedSkill = selectedSkillId !== null && currentActor != null ? currentActor.skills[selectedSkillId] : null;
+
+    useEffect(() => {
+        if (phase !== BattlePhase.NextRound){
+            return;
+        }
+        dispatch(progressRound());
+    }, [phase, progressRound]);
+
+    useEffect(() => {
+        if (phase !== BattlePhase.NextTurn){
+            return;
+        }
+        dispatch(processTurn());
+    }, [phase, processTurn]);
+
+    useEffect(() => {
+        if (phase !== BattlePhase.ActorUsesSkill){
+            return;
+        }
+        const id = setTimeout(() => { dispatch(processTurn()); }, 500);
+        return () => clearTimeout(id);
+    }, [phase, progressRound]);
+
+
+    useEffect(() => {
+        if (phase !== BattlePhase.EnemyTurn){
+            return;
+        }
+        if (currentActorId === null){
+            throw Error("CurrentActorId is null");
+        }
+        const skillUse = getEnemySkillUse(actors, currentActorId);
+        const id = setTimeout(() => { dispatch(processActorSkill(skillUse)); }, 500);
+        return () => clearTimeout(id);
+    }, [phase, progressRound]);
+
+    const handleSkillClick = (skill: BattleSkillState) => {
+        if (selectedSkillId == skill.id) {
+            dispatch(selectSkill(null));
+            return;
+        }
+        dispatch(selectSkill(skill.id));
+    }
+
+    const handleActorClick = (actor: BattleActorState) => {
+        if (phase !== BattlePhase.PlayerTurn){
+            return;
+        }
+        if (currentActorId === null || selectedSkill === null)
+        {
+            return;
+        }
+        if (actor.team == BattleTeam.Player && selectedSkill.targetType === BattleSkillTargetType.Opponent) {
+            return;
+        }
+        if (actor.team == BattleTeam.Enemy && selectedSkill.targetType === BattleSkillTargetType.Ally) {
+            return;
+        }
+        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetIds: [actor.id] }));
+    }
+
+    return <div className="battle" style={{backgroundImage: `url(/content/backgrounds/${background}.png)`}}>
+        <BattleRow actors={enemyTeam} team={BattleTeam.Enemy} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
+        <BattleRow actors={playerTeam} team={BattleTeam.Player} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
+        <div className="battle-skills">
+            {phase == BattlePhase.PlayerTurn && currentActor?.skills.map(skill => <BattleSkill skill={skill} key={skill.id} onClick={handleSkillClick} selected={skill.id === selectedSkillId}/>)}
+        </div>
+    </div>;
+}
+

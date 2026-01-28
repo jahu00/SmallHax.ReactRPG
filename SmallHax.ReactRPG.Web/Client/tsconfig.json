@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2024",                         // Specify ECMAScript target version.
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],// Specify library files to be included in the compilation.
+    "allowJs": true,                         // Allow JavaScript files to be compiled.
+    "skipLibCheck": true,                    // Skip type checking of declaration files.
+    "esModuleInterop": true,                 // Enables interoperability between CommonJS and ES Modules.
+    "strict": true,                          // Enable all strict type-checking options.
+    "forceConsistentCasingInFileNames": true,// Ensure consistent casing in file names.
+    "moduleResolution": "node",              // Module resolution strategy to use.
+    "resolveJsonModule": true,               // Allow importing .json files.
+    "isolatedModules": true,                 // Transpile each file as a separate module (necessary for SSR apps).
+    "noEmit": true,                          // Do not emit outputs; useful during development with Babel/Webpack setup.
+    "jsx": "react"
+  },
+  "include": ["src"]                         // Specify the root folders and files to be included in compilation.
+}
