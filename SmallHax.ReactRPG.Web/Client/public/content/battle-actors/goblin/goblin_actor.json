@@ -1,0 +1,14 @@
+{
+    "default": {
+        "scale": 75,
+        "anchor": {
+            "x": 50,
+            "y": 110
+        }
+    },
+    "variants": [
+        {"name": "front"},
+        {"name": "back"},
+        {"name": "dead"}
+    ]
+}

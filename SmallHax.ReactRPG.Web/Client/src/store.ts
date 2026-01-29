@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import battleReducer from './store/battle-slice'
+import { spriteApi } from './store/sprite-api'
 
 export const store = configureStore({
   reducer: {
-    battle: battleReducer
+    battle: battleReducer,
+    [spriteApi.reducerPath]: spriteApi.reducer
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(spriteApi.middleware)
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
