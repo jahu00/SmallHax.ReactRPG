@@ -8,10 +8,10 @@ import { Point } from "../types/point";
 const _defaultSpriteData: DefaultSpriteData = {
     name: "default",
     anchor: {
-        x: 50,
-        y: 0
+        x: 0.5,
+        y: 0.95
     },
-    scale: 100,
+    scale: 1,
     fileName: "/content/battle-actors/default.png"
 };
 
@@ -36,9 +36,9 @@ export function BattleActor({actor, orientation, selected, onClick}: BattleActor
     };
     const scale = spriteData?.scale ?? defaultSpriteData.scale;
     const style = {
-        "--battle-actor-sprite-scale": scale + "%",
-        "--battle-actor-sprite-anchor-x": anchor.x + "%",
-        "--battle-actor-sprite-anchor-y": anchor.y + "%",
+        "--battle-actor-sprite-scale": (scale * 100) + "%",
+        "--battle-actor-sprite-offset-x": (-100 * anchor.x).toFixed(2) + "%",
+        "--battle-actor-sprite-offset-y": (100 - anchor.y * 100).toFixed(2) + "%",
     } as React.CSSProperties;
     let spriteFileName = spriteData?.fileName;
     if (spriteFileName)

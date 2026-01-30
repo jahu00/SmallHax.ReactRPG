@@ -86,9 +86,8 @@
     bottom: 0;
     left: 50%;
     max-height: var(--battle-actor-size);
-    /*transform-origin: bottom;*/
-    transform-origin: var(--battle-actor-sprite-anchor-x) var(--battle-actor-sprite-anchor-y);
-    transform: translateX(-50%) scale(var(--battle-actor-sprite-scale));
+    transform-origin: bottom;
+    transform: translate(var(--battle-actor-sprite-offset-x), var(--battle-actor-sprite-offset-y)) scale(var(--battle-actor-sprite-scale));
 }
 
 .battle-actor-shadow {
