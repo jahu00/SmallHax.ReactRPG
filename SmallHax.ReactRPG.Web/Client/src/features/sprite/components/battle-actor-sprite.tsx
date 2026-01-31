@@ -16,9 +16,10 @@ const _defaultSpriteData: DefaultSpriteData = {
 export interface BattleActorSpriteProps {
     actorName: string;
     pose: string;
+    selected?: boolean;
 }
 
-export function BattleActorSprite({actorName, pose}: BattleActorSpriteProps) {
+export function BattleActorSprite({actorName, pose, selected}: BattleActorSpriteProps) {
     const spriteSetQuery = useGetBattleActorSpriteSetQuery(actorName);
     if (spriteSetQuery.isLoading){
         return <></>;
@@ -48,7 +49,8 @@ export function BattleActorSprite({actorName, pose}: BattleActorSpriteProps) {
         spriteFileName = defaultSpriteData.fileName;
     }
     return <>
-            <div className="battle-actor-shadow"></div>
+            <div className="battle-actor-shadow" style={style}></div>
+            {selected && <div className="battle-actor-selection-indicator"></div>}
             <img className="battle-actor-sprite" src={spriteFileName} style={style}/>
         </>;
 }

@@ -77,10 +77,6 @@
     transform: translateX(-50%);
 }
 
-.battle-actor.selected .battle-actor-shadow {
-    border: solid 3px var(--battle-actor-selected-color);
-}
-
 .battle-actor-sprite {
     position: absolute;
     bottom: 0;
@@ -98,12 +94,24 @@
     height: var(--battle-slot-width);
     background: radial-gradient(
         #000000ff,
-        #00000060 50%,
+        #00000070 50%,
+        #00000000 70%,
         #00000000
     );
     border-radius: calc(var(--battle-slot-width) / 2);
-    transform: translate(-50%, 50%) scaleY(50%);
+    transform: translate(-50%, 50%) scaleY(50%) scale(var(--battle-actor-sprite-scale));
     z-index: -1;
+}
+
+.battle-actor-selection-indicator {
+    position:absolute;
+    bottom: 0;
+    left: 50%;
+    width: var(--battle-slot-width);
+    height: var(--battle-slot-width);
+    border-radius: calc(var(--battle-slot-width) / 2);
+    transform: translate(-50%, 50%) scaleY(50%);
+    border: solid 3px var(--battle-actor-selected-color);
 }
 
 .battle-actor .click-area {
