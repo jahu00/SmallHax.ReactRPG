@@ -1,9 +1,9 @@
 import React from "react";
 import { BattleActorOrientation } from "../types/battle-actor-orientation";
 import { BattleActorState } from "../types/battle-actor-state";
-import { DefaultSpriteData } from "../types/sprite-set";
-import { useGetBattleActorSpriteSetQuery } from "../store/sprite-api";
-import { Point } from "../types/point";
+import { DefaultSpriteData } from "types/sprite-set";
+import { useGetBattleActorSpriteSetQuery } from "features/sprite/sprite-api";
+import { Point } from "types/point";
 
 const _defaultSpriteData: DefaultSpriteData = {
     name: "default",

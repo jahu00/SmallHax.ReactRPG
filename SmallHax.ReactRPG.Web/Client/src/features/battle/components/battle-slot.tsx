@@ -1,6 +1,6 @@
 import React from "react";
 import { BattleActor } from "./battle-actor";
-import { BattleTeam } from "../types/battle-team";
+import { BattleTeam } from "types/battle/battle-team";
 import { BattleActorOrientation } from "../types/battle-actor-orientation";
 import { BattleActorStatusBar } from "./battle-actor-status-bar";
 import { BattleActorState } from "../types/battle-actor-state";

@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import "../assets/battle.css"
+import "assets/battle.css"
 import { BattleSkill } from "./battle-skill";
-import { BattleData } from "../types/battle-data";
-import { BattleTeam } from "../types/battle-team";
+import { BattleData } from "types/battle/battle-data";
+import { BattleTeam } from "types/battle/battle-team";
 import { BattleRow } from "./battle-row";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState } from "../../../store";
 import { BattleActorState } from "../types/battle-actor-state";
 import { BattlePhase } from "../types/battle-phase";
-import { getEnemySkillUse, processActorSkill, processTurn, progressRound, selectSkill } from "../store/battle-slice";
+import { getEnemySkillUse, processActorSkill, processTurn, progressRound, selectSkill } from "../battle-slice";
 import { BattleSkillState } from "../types/battle-skill-state";
-import { BattleSkillTargetType } from "../types/battle-skill-target-type";
+import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 
 export interface BattleProps {
     battle: BattleData

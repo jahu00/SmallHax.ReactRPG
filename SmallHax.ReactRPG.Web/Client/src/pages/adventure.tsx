@@ -1,16 +1,15 @@
 import React, { useEffect } from "react";
-import { Battle } from "../components/battle";
-import { BattleData } from "../types/battle-data";
-import { BattleActorData } from "../types/battle-actor-data";
+import { Battle } from "features/battle/components/battle";
+import { BattleData } from "types/battle/battle-data";
+import { BattleActorData } from "types/battle/battle-actor-data";
 import { useDispatch } from "react-redux";
-import { initBattle } from "../store/battle-slice";
-import { BattleSkillTargetType } from "../types/battle-skill-target-type";
-import { BattleSkillActionType } from "../types/battle-skill-action-type";
+import { initBattle } from "features/battle/battle-slice";
+import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
+import { BattleSkillActionType } from "types/battle/battle-skill-action-type";
 
 export function Adventure() {
     const goblin: BattleActorData = {
         name: "goblin",
-        state: "alive",
         skills: [
             {
                 name: "Attack",
@@ -26,7 +25,6 @@ export function Adventure() {
     };
     const elf: BattleActorData = {
         name: "elf",
-        state: "alive",
         skills: [
             {
                 name: "arrow",
@@ -48,7 +46,6 @@ export function Adventure() {
     }
     const knight: BattleActorData = {
         name: "knight",
-        state: "alive",
         skills: [
             {
                 name: "sword",

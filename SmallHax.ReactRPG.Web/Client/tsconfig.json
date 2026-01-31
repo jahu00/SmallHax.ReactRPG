@@ -11,7 +11,14 @@
     "resolveJsonModule": true,               // Allow importing .json files.
     "isolatedModules": true,                 // Transpile each file as a separate module (necessary for SSR apps).
     "noEmit": true,                          // Do not emit outputs; useful during development with Babel/Webpack setup.
-    "jsx": "react"
+    "jsx": "react",
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@features/*": ["features/*"],
+      "@types/*": ["types/*"],
+      "@assets/*": ["assets/*"]
+    }
   },
   "include": ["src"]                         // Specify the root folders and files to be included in compilation.
 }

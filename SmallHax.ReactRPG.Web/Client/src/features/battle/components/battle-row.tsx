@@ -1,5 +1,5 @@
 import React from "react";
-import { BattleTeam } from "../types/battle-team";
+import { BattleTeam } from "types/battle/battle-team";
 import { BattleSlot } from "./battle-slot";
 import { BattleActorState } from "../types/battle-actor-state";
 

@@ -1,6 +1,6 @@
 import React from "react";
-import { ProgressBar } from "./common/progress-bar";
-import { BattleTeam } from "../types/battle-team";
+import { ProgressBar } from "components/progress-bar";
+import { BattleTeam } from "types/battle/battle-team";
 import { BattleActorState } from "../types/battle-actor-state";
 
 export interface BattleActorStatusBarProps {
