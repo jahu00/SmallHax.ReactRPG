@@ -3,7 +3,7 @@ import { BattleActorOrientation } from "../types/battle-actor-orientation";
 import { BattleActorState } from "../types/battle-actor-state";
 import { DefaultSpriteData } from "types/sprite-set";
 import { useGetBattleActorSpriteSetQuery } from "features/sprite/sprite-api";
-import { Point } from "types/point";
+import { BattleActorSprite } from "features/sprite/components/battle-actor-sprite";
 
 const _defaultSpriteData: DefaultSpriteData = {
     name: "default",
@@ -27,37 +27,12 @@ export function BattleActor({actor, orientation, selected, onClick}: BattleActor
     if (spriteSetQuery.isLoading){
         return <></>;
     }
-    const spriteKind: string = actor.hp === 0 ? "dead" : orientation;
-    const spriteData = spriteSetQuery.data?.variants.find(x => x.name == spriteKind);
-    const defaultSpriteData = spriteSetQuery.data?.default ?? _defaultSpriteData;
-    const anchor: Point = {
-        x: spriteData?.anchor?.x ?? defaultSpriteData.anchor.x,
-        y: spriteData?.anchor?.y ?? defaultSpriteData.anchor.y,
-    };
-    const scale = spriteData?.scale ?? defaultSpriteData.scale;
-    const style = {
-        "--battle-actor-sprite-scale": (scale * 100) + "%",
-        "--battle-actor-sprite-offset-x": (-100 * anchor.x).toFixed(2) + "%",
-        "--battle-actor-sprite-offset-y": (100 - anchor.y * 100).toFixed(2) + "%",
-    } as React.CSSProperties;
-    let spriteFileName = spriteData?.fileName;
-    if (spriteFileName)
-    {
-        spriteFileName = `/content/battle-actors/${actor.name}/${spriteFileName}`;
-    }
-    else if (spriteData || defaultSpriteData !== _defaultSpriteData){
-        const spriteName = spriteData?.name ?? defaultSpriteData.name;
-        spriteFileName = `/content/battle-actors/${actor.name}/${actor.name}_${spriteName}.png`;
-    }
-    else {
-        spriteFileName = defaultSpriteData.fileName;
-    }
+    const pose: string = actor.hp === 0 ? "dead" : orientation;
     const handleClick = () => {
         onClick?.(actor);
     }
-    return <div className={"battle-actor " + (selected ? "selected" : "")} style={style}>
-            <div className="battle-actor-shadow"></div>
-            <img className="battle-actor-sprite" src={spriteFileName}/>
+    return <div className={"battle-actor " + (selected ? "selected" : "")}>
+            <BattleActorSprite actorName={actor.name} pose={pose} />
             <div className="click-area" onClick={handleClick}></div>
         </div>;
 }
