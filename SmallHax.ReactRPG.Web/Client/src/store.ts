@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import battleReducer from './store/battle-slice'
-import { spriteApi } from './store/sprite-api'
+import { spriteApi } from './features/sprite/sprite-api'
 
 export const store = configureStore({
   reducer: {

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { SpriteSet } from '../types/sprite-set';
+import { SpriteSet } from '../../types/sprite-set';
 export const spriteApi = createApi({
     reducerPath: "spriteApi",
     baseQuery: fetchBaseQuery({ baseUrl: '/content/'}),
