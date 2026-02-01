@@ -72,10 +72,25 @@ export function Adventure() {
         defense: 2,
         speed: 1
     }
+    const vampire: BattleActorData = {
+        name: "vampire",
+        skills: [
+            {
+                name: "bloody_fangs",
+                maxCooldown: 1,
+                actionType: BattleSkillActionType.Attack,
+                targetType: BattleSkillTargetType.Opponent
+            }
+        ],
+        maxHp: 7,
+        attack: 2,
+        defense: 1,
+        speed: 2
+    }
     const battle: BattleData = {
         background: "forest_2",
         enemyTeam: [{...goblin}, {...goblin}, {...goblin}],
-        playerTeam: [knight, elf]
+        playerTeam: [knight, elf, vampire]
     }
     const dispatch = useDispatch();
     useEffect(() => {
