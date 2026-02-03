@@ -81,13 +81,25 @@ export function Battle(){
         {
             return;
         }
-        if (actor.team == BattleTeam.Player && selectedSkill.targetType === BattleSkillTargetType.Opponent) {
+        if (
+            actor.id != currentActorId &&
+            [BattleSkillTargetType.Self].indexOf(selectedSkill.targetType) > -1
+        ) {
             return;
         }
-        if (actor.team == BattleTeam.Enemy && selectedSkill.targetType === BattleSkillTargetType.Ally) {
+        if (
+            actor.team === BattleTeam.Player &&
+            [BattleSkillTargetType.Opponent, BattleSkillTargetType.AllOpponent].indexOf(selectedSkill.targetType) > -1
+        ) {
             return;
         }
-        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetIds: [actor.id] }));
+        if (
+            actor.team === BattleTeam.Enemy &&
+            [BattleSkillTargetType.Ally, BattleSkillTargetType.AllAllies].indexOf(selectedSkill.targetType) > -1
+        ) {
+            return;
+        }
+        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetId: actor.id }));
     }
 
     return <div className="battle" style={{backgroundImage: `url(/content/backgrounds/${background}.png)`}}>

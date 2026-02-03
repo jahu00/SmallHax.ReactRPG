@@ -1,4 +1,9 @@
 export enum BattleSkillTargetType {
+    Self = "self",
     Ally = "ally",
-    Opponent = "opponent"
+    AllAllies = "all-allies",
+    Opponent = "opponent",
+    AllOpponent = "all-opponent",
+    Anyone = "anyone",
+    Everyone = "anyone"
 }
