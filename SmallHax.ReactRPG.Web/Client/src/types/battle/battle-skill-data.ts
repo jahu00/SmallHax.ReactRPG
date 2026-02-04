@@ -6,6 +6,7 @@ export interface BattleSkillData {
     maxCooldown: number;
     targetType: BattleSkillTargetType;
     actionType: BattleSkillActionType;
+    targetCondition?: BattleSkillCondition;
     steps: BattleSkillStep[];
 }
 
@@ -16,7 +17,7 @@ export interface BattleSkillStep {
 export interface BattleSkillEffect {
     type: BattleSkillEffectType;
     target: BattleSkillEffetTarget;
-    condition: BattleSkillEffectCondition;
+    condition?: BattleSkillCondition;
     power?: number;
     drainPower?: number;
     range?: number;
@@ -67,7 +68,8 @@ export enum BattleSkillEffetTarget {
     Random
 }
 
-export enum BattleSkillEffectCondition {
+export enum BattleSkillCondition {
     Alive,
-    Dead
+    Dead,
+    DeadOrAlive
 }

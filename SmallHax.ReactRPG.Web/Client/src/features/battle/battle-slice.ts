@@ -6,7 +6,7 @@ import { BattleActorState } from './types/battle-actor-state'
 import { BattleTeam } from 'types/battle/battle-team'
 import { BattleActorData } from 'types/battle/battle-actor-data'
 import { BattleSkillUse } from './types/battle-skill-use'
-import { BattleSkillData, BattleSkillEffect, BattleSkillEffectCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from 'types/battle/battle-skill-data'
+import { BattleSkillData, BattleSkillEffect, BattleSkillCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from 'types/battle/battle-skill-data'
 import { BattleSkillState } from './types/battle-skill-state'
 import { BattleState } from './types/battle-state'
 import { BattleSkillActionType } from 'types/battle/battle-skill-action-type'
@@ -90,10 +90,14 @@ export function isDead(actor: BattleActorState): boolean {
 export function getTargetsForSkillEffect(skillEffect: BattleSkillEffect, actors: BattleActorState[], caster: BattleActorState, mainTarget: BattleActorState): BattleActorState[] {
   let targets: BattleActorState[] = [];
   for (let actor of actors) {
-    if (skillEffect.condition == BattleSkillEffectCondition.Alive && !isAlive(actor)){
+    let condition = skillEffect.condition;
+    if (!condition) {
+      condition = BattleSkillCondition.Alive;
+    }
+    if (condition == BattleSkillCondition.Alive && !isAlive(actor)){
       continue;
     }
-    if (skillEffect.condition == BattleSkillEffectCondition.Dead && !isDead(actor)){
+    if (condition == BattleSkillCondition.Dead && !isDead(actor)){
       continue;
     }
     if (skillEffect.target === BattleSkillEffetTarget.Self && actor.id != caster.id){

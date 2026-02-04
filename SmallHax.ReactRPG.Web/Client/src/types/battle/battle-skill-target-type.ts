@@ -5,5 +5,5 @@ export enum BattleSkillTargetType {
     Opponent = "opponent",
     AllOpponent = "all-opponent",
     Anyone = "anyone",
-    Everyone = "anyone"
+    Everyone = "everyone"
 }

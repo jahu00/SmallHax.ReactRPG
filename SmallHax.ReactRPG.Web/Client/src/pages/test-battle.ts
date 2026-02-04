@@ -1,11 +1,10 @@
 import { BattleActorData } from "types/battle/battle-actor-data";
 import { BattleData } from "types/battle/battle-data";
 import { BattleSkillActionType } from "types/battle/battle-skill-action-type";
-import { BattleSkillData, BattleSkillEffect, BattleSkillEffectCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from "types/battle/battle-skill-data";
+import { BattleSkillData, BattleSkillEffect, BattleSkillCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from "types/battle/battle-skill-data";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 
     const attackEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
@@ -26,7 +25,6 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             };
 
     const healEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Heal,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
@@ -46,7 +44,6 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             };
 
     const aoeEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.AllOpponents,
                 power: 1,
@@ -68,7 +65,6 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             };
 
     const buffEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Buff,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 applyBuffs: [
@@ -92,7 +88,6 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             };
 
     const drainEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
@@ -114,19 +109,18 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             };
 
     const healSacraficeEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Dead,
                 type: BattleSkillEffectType.Heal,
                 target: BattleSkillEffetTarget.SelectedTarget,
+                condition: BattleSkillCondition.Dead,
                 power: 0.1,
                 positiveStat: "maxHp",
                 positiveStatSource: BattleSkillEffectStatSource.Target
             };
 
     const selfSacraficeEffect: BattleSkillEffect = {
-                condition: BattleSkillEffectCondition.Alive,
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.Self,
-                power: 0.25,
+                power: 0.20,
                 positiveStat: "maxHp",
                 positiveStatSource: BattleSkillEffectStatSource.Caster,
                 cannotKill: true
@@ -137,6 +131,7 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 maxCooldown: 3,
                 actionType: BattleSkillActionType.Heal,
                 targetType: BattleSkillTargetType.Ally,
+                targetCondition: BattleSkillCondition.Dead,
                 steps: [
                     {
                         effects: [{...selfSacraficeEffect}]
