@@ -65,7 +65,7 @@ export function getEnemySkillUse(actors: BattleActorState[], actorId: number): B
     throw Error(`Actor with id ${actorId} not found!`);
   }
   const oppositeTeam = actors.filter(x => x.team !== actor.team);
-  const availableTargets = oppositeTeam.filter(x => x.hp > 0);
+  const availableTargets = oppositeTeam.filter(x => isAlive(x));
   if (!availableTargets.length) {
     throw Error(`No living member of the opposing team found!`);
   }
@@ -147,6 +147,7 @@ export function getTargetsForSkillEffect(skillEffect: BattleSkillEffect, actors:
     }
     targets.push(actor);
   }
+
   if ([
           BattleSkillEffetTarget.RandomAlly,
           BattleSkillEffetTarget.RandomAllyOtherThanSelf,
@@ -154,7 +155,7 @@ export function getTargetsForSkillEffect(skillEffect: BattleSkillEffect, actors:
           BattleSkillEffetTarget.RandomOpponent,
           BattleSkillEffetTarget.RandomOpponentOtherThanTarget,
           BattleSkillEffetTarget.Random,
-    ].some(x => x === skillEffect.target) || targets.length > 0) {
+    ].some(x => x === skillEffect.target) && targets.length > 0) {
       const target = getRandomItem(targets);
       targets = [target];
     }
@@ -245,21 +246,20 @@ export const battleSlice = createSlice({
     processActorSkill: (state, action: PayloadAction<BattleSkillUse>) => {
       const caster = state.actors[action.payload.casterId];
       const skill = caster.skills[action.payload.skillId];
-      const mainTarget = state.actors[action.payload.skillId];
+      const mainTarget = state.actors[action.payload.targetId];
       for(let skillStep of skill.steps) {
         for (let skillEffect of skillStep.effects){
           let targets = getTargetsForSkillEffect(skillEffect, state.actors, caster, mainTarget);
-
           for (let target of targets){
             let positiveStatValue = skillEffect.power ?? 0;
-            let positiveStatSource = getStatSource(skillEffect.positiveStatSource, caster, target);
+            let positiveStatSource = getStatSource(skillEffect.positiveStatSource, caster, target) ?? caster;
 
             if (positiveStatSource && skillEffect.positiveStat && positiveStatValue) {
               positiveStatValue = positiveStatValue * getStat(positiveStatSource, skillEffect.positiveStat);
             }
 
             let negativeStatValue = 0;
-            let negativeStatSource = getStatSource(skillEffect.negativeStatSource, caster, target);
+            let negativeStatSource = getStatSource(skillEffect.negativeStatSource, caster, target) ?? target;
 
             if (negativeStatSource && skillEffect.negativeStat) {
               negativeStatValue = getStat(negativeStatSource, skillEffect.negativeStat)
@@ -276,11 +276,11 @@ export const battleSlice = createSlice({
               skillPower = 0;
             }
             let newHp = target.hp;
-            if (skill.actionType === BattleSkillActionType.Attack)
+            if (skillEffect.type === BattleSkillEffectType.Damage)
             {
               newHp -= skillPower;
             }
-            else if(skill.actionType === BattleSkillActionType.Heal)
+            else if(skillEffect.type === BattleSkillEffectType.Heal)
             {
               newHp += skillPower;
             }
@@ -290,12 +290,19 @@ export const battleSlice = createSlice({
             else if (newHp > target.maxHp){
               newHp = target.maxHp;
             }
+            if (skillEffect.cannotKill && newHp == 0){
+              newHp = 1;
+            }
             let drain = target.hp - newHp;
             if (drain < 0) {
               drain = 0;
             }
             // TODO: Take into account passive drain and buffs
-            drain = Math.ceil(drain * (skillEffect.drainPower ?? 0));
+            let drainPower = skillEffect.drainPower ?? 0;
+            if (drainPower > 1) {
+              drainPower = 1;
+            }
+            drain = Math.ceil(drain * drainPower);
             target.hp = newHp;
             if (drain > 0) {
               let casterNewHp = caster.hp + drain;

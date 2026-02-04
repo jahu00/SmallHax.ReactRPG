@@ -7,5 +7,6 @@ export function getRandomItem<T>(array: Array<T>) {
         throw new Error("Array is empty");
     }
     const i = getRandomInt(array.length);
-    return array[i];
+    const result = array[i];
+    return result;
 }

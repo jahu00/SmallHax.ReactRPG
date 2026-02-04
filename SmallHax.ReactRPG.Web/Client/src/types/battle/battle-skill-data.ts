@@ -26,6 +26,7 @@ export interface BattleSkillEffect {
     negativeStatSource?: BattleSkillEffectStatSource;
     applyBuffs?: BattleSkillEffectBuff[];
     removeBuffs?: BattleSkillEffectBuff[];
+    cannotKill?: boolean;
 }
 
 export interface BattleSkillEffectBuff {

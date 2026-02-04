@@ -1,7 +1,7 @@
 import { BattleActorData } from "types/battle/battle-actor-data";
 import { BattleData } from "types/battle/battle-data";
 import { BattleSkillActionType } from "types/battle/battle-skill-action-type";
-import { BattleSkillData, BattleSkillEffect, BattleSkillEffectCondition, BattleSkillEffectType, BattleSkillEffetTarget } from "types/battle/battle-skill-data";
+import { BattleSkillData, BattleSkillEffect, BattleSkillEffectCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from "types/battle/battle-skill-data";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 
     const attackEffect: BattleSkillEffect = {
@@ -9,8 +9,8 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
-                positiveStat: "Attack",
-                negativeStat: "Defense"
+                positiveStat: "attack",
+                negativeStat: "defense"
             };
 
     const attackSkill: BattleSkillData = {
@@ -30,7 +30,7 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 type: BattleSkillEffectType.Heal,
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
-                positiveStat: "Magic"
+                positiveStat: "attack"
             };
 
     const healSkill: BattleSkillData = {
@@ -50,8 +50,9 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 type: BattleSkillEffectType.Damage,
                 target: BattleSkillEffetTarget.AllOpponents,
                 power: 1,
-                positiveStat: "Attack",
-                negativeStat: "Defense"
+                range: 1,
+                positiveStat: "attack",
+                negativeStat: "defense"
             };
 
     const aoeSkill: BattleSkillData = {
@@ -96,8 +97,8 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 target: BattleSkillEffetTarget.SelectedTarget,
                 power: 1,
                 drainPower: 0.5,
-                positiveStat: "Attack",
-                negativeStat: "Defense"
+                positiveStat: "attack",
+                negativeStat: "defense"
             };
 
     const drainSkill: BattleSkillData = {
@@ -108,6 +109,40 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 steps: [
                     {
                         effects: [{...drainEffect}]
+                    }
+                ]
+            };
+
+    const healSacraficeEffect: BattleSkillEffect = {
+                condition: BattleSkillEffectCondition.Dead,
+                type: BattleSkillEffectType.Heal,
+                target: BattleSkillEffetTarget.SelectedTarget,
+                power: 0.1,
+                positiveStat: "maxHp",
+                positiveStatSource: BattleSkillEffectStatSource.Target
+            };
+
+    const selfSacraficeEffect: BattleSkillEffect = {
+                condition: BattleSkillEffectCondition.Alive,
+                type: BattleSkillEffectType.Damage,
+                target: BattleSkillEffetTarget.Self,
+                power: 0.25,
+                positiveStat: "maxHp",
+                positiveStatSource: BattleSkillEffectStatSource.Caster,
+                cannotKill: true
+            };
+
+    const selfSacraficeSkill: BattleSkillData = {
+                name: "transfusion",
+                maxCooldown: 3,
+                actionType: BattleSkillActionType.Heal,
+                targetType: BattleSkillTargetType.Ally,
+                steps: [
+                    {
+                        effects: [{...selfSacraficeEffect}]
+                    },
+                    {
+                        effects: [{...healSacraficeEffect}]
                     }
                 ]
             };
@@ -146,7 +181,8 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
     const vampire: BattleActorData = {
         name: "vampire",
         skills: [
-            {...drainSkill, name: "bloody_fangs"}
+            {...drainSkill, name: "bloody_fangs"},
+            {...selfSacraficeSkill, name: "transfusion"}
         ],
         maxHp: 7,
         attack: 2,
@@ -155,6 +191,6 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
     }
     export const testBattle: BattleData = {
         background: "forest_2",
-        enemyTeam: [{...goblin}, {...goblin}, {...goblin}],
+        enemyTeam: [{...goblin}, {...goblin}, {...goblin}, {...goblin}, {...goblin}],
         playerTeam: [knight, elf, vampire]
     }
