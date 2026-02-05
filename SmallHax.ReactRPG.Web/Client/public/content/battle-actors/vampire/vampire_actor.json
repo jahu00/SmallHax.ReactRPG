@@ -2,6 +2,13 @@
     "variants": [
         {"name": "front"},
         {"name": "back"},
-        {"name": "dead"}
+        {
+            "name": "dead",
+            "scale": 0.9,
+            "anchor": {
+                "x": 0.5,
+                "y": 0.9
+            }
+        }
     ]
 }

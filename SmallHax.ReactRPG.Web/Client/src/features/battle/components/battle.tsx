@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { BattleActorState } from "../types/battle-actor-state";
 import { BattlePhase } from "../types/battle-phase";
-import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, progressRound, selectSkill } from "../battle-slice";
+import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, progressRound, selectSkill, setActorAnimation } from "../battle-slice";
 import { BattleSkillState } from "../types/battle-skill-state";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 import { BattleSkillCondition } from "types/battle/battle-skill-data";
@@ -62,6 +62,7 @@ export function Battle(){
             throw Error("CurrentActorId is null");
         }
         const skillUse = getEnemySkillUse(actors, currentActorId);
+        dispatch(setActorAnimation({ actorId: currentActorId, animationName: "attacking" }));
         const id = setTimeout(() => { dispatch(processActorSkill(skillUse)); }, 500);
         return () => clearTimeout(id);
     }, [phase, progressRound]);
@@ -107,7 +108,9 @@ export function Battle(){
         if (targetCondition === BattleSkillCondition.Dead && isAlive(actor)){
             return;
         }
-        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetId: actor.id }));
+        dispatch(setActorAnimation({ actorId: currentActorId, animationName: "attacking" }));
+        const id = setTimeout(() => { dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetId: actor.id })); }, 500);
+        return () => clearTimeout(id);
     }
 
     return <div className="battle" style={{backgroundImage: `url(/content/backgrounds/${background}.png)`}}>

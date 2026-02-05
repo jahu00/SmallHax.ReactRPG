@@ -72,10 +72,12 @@
     }
 
 .battle-actor {
+    --x-offset: 0;
+    --y-offset: 0;
     position:absolute;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translate(var(--x-offset), var(--y-offset));
 }
 
 .battle-actor-sprite {
@@ -86,6 +88,14 @@
     transform-origin: bottom;
     transform: translate(var(--battle-actor-sprite-offset-x), var(--battle-actor-sprite-offset-y)) scale(var(--battle-actor-sprite-scale));
 }
+
+    .battle-actor.hurting .battle-actor-sprite {
+        filter: drop-shadow(0 0 0.75rem crimson);
+    }
+
+    .battle-actor.healing .battle-actor-sprite {
+        filter: drop-shadow(0 0 0.75rem lime);
+    }
 
 .battle-actor-shadow {
     position:absolute;
@@ -188,4 +198,14 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+@keyframes moveUp {
+  from { --y-offset: 0px; }
+  to   { --y-offset: -20px; }   /* 20 px up */
+}
+
+@keyframes moveDown {
+  from { --y-offset: 0px; }
+  to   { --y-offset: 20px; }   /* 20 px up */
 }
