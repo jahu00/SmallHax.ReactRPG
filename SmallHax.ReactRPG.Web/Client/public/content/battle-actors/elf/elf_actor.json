@@ -1,14 +1,14 @@
 {
-    "default": {
-        "scale": 1,
-        "anchor": {
-            "x": 0.5,
-            "y": 0.95
-        }
-    },
     "variants": [
         {"name": "front"},
         {"name": "back"},
-        {"name": "dead"}
+        {
+            "name": "dead",
+            "scale": 0.75,
+            "anchor": {
+                "x": 0.5,
+                "y": 0.8
+            }
+        }
     ]
 }

@@ -11,6 +11,7 @@ import { BattleSkillState } from './types/battle-skill-state'
 import { BattleState } from './types/battle-state'
 import { BattleSkillActionType } from 'types/battle/battle-skill-action-type'
 import { getRandomItem } from 'utils/math'
+import { BattleActorSetAnimation } from './types/battle-actor-set-animation'
 
 /*export interface BattleState {
     phase: BattlePhase
@@ -204,6 +205,11 @@ export const battleSlice = createSlice({
       state.phase = BattlePhase.NextTurn;
     },
     processTurn: (state) => {
+      for (let actor of state.actors){
+        if (actor.animationName){
+          actor.animationName = undefined;
+        }
+      }
       if (hasTeamLost(state.actors, BattleTeam.Enemy)){
         state.phase = BattlePhase.Won;
         return;
@@ -283,10 +289,16 @@ export const battleSlice = createSlice({
             if (skillEffect.type === BattleSkillEffectType.Damage)
             {
               newHp -= skillPower;
+              if (target.id !== caster.id){
+                target.animationName = "hurting";
+              }
             }
             else if(skillEffect.type === BattleSkillEffectType.Heal)
             {
               newHp += skillPower;
+              if (target.id !== caster.id){
+                target.animationName = "healing";
+              }
             }
             if (newHp < 0){
               newHp = 0
@@ -321,12 +333,16 @@ export const battleSlice = createSlice({
       }
 
       skill.cooldown = skill.maxCooldown;
-      state.phase = BattlePhase.NextTurn;
+      state.phase = BattlePhase.ActorUsesSkill;
+    },
+    setActorAnimation: (state, action: PayloadAction<BattleActorSetAnimation>) => {
+      const actor = state.actors[action.payload.actorId];
+      actor.animationName = action.payload.animationName;
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { initBattle, progressRound, processTurn, selectSkill, processActorSkill } = battleSlice.actions
+export const { initBattle, progressRound, processTurn, selectSkill, processActorSkill, setActorAnimation } = battleSlice.actions
 
 export default battleSlice.reducer

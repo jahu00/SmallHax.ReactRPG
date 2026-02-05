@@ -8,4 +8,5 @@ export interface BattleActorState extends BattleActorData {
     hp: number;
     team: BattleTeam;
     skills: BattleSkillState[];
+    animationName?: string;
 }
