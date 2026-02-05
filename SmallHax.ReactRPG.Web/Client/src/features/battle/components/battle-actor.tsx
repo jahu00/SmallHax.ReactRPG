@@ -4,6 +4,7 @@ import { BattleActorState } from "../types/battle-actor-state";
 import { DefaultSpriteData } from "types/sprite-set";
 import { useGetBattleActorSpriteSetQuery } from "features/sprite/sprite-api";
 import { BattleActorSprite } from "features/sprite/components/battle-actor-sprite";
+import { isDead } from "../battle-slice";
 
 const _defaultSpriteData: DefaultSpriteData = {
     name: "default",
@@ -27,7 +28,7 @@ export function BattleActor({actor, orientation, selected, onClick}: BattleActor
     if (spriteSetQuery.isLoading){
         return <></>;
     }
-    const pose: string = actor.hp === 0 ? "dead" : orientation;
+    const pose: string = isDead(actor) ? "dead" : orientation;
     const handleClick = () => {
         onClick?.(actor);
     }

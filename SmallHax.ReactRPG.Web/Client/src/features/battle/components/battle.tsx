@@ -8,9 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { BattleActorState } from "../types/battle-actor-state";
 import { BattlePhase } from "../types/battle-phase";
-import { getEnemySkillUse, processActorSkill, processTurn, progressRound, selectSkill } from "../battle-slice";
+import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, progressRound, selectSkill } from "../battle-slice";
 import { BattleSkillState } from "../types/battle-skill-state";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
+import { BattleSkillCondition } from "types/battle/battle-skill-data";
 
 export interface BattleProps {
     battle: BattleData
@@ -81,13 +82,32 @@ export function Battle(){
         {
             return;
         }
-        if (actor.team == BattleTeam.Player && selectedSkill.targetType === BattleSkillTargetType.Opponent) {
+        if (
+            actor.id != currentActorId &&
+            [BattleSkillTargetType.Self].indexOf(selectedSkill.targetType) > -1
+        ) {
             return;
         }
-        if (actor.team == BattleTeam.Enemy && selectedSkill.targetType === BattleSkillTargetType.Ally) {
+        if (
+            actor.team === BattleTeam.Player &&
+            [BattleSkillTargetType.Opponent, BattleSkillTargetType.AllOpponent].indexOf(selectedSkill.targetType) > -1
+        ) {
             return;
         }
-        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetIds: [actor.id] }));
+        if (
+            actor.team === BattleTeam.Enemy &&
+            [BattleSkillTargetType.Ally, BattleSkillTargetType.AllAllies].indexOf(selectedSkill.targetType) > -1
+        ) {
+            return;
+        }
+        const targetCondition = selectedSkill.targetCondition ?? BattleSkillCondition.Alive;
+        if (targetCondition === BattleSkillCondition.Alive && isDead(actor)){
+            return;
+        }
+        if (targetCondition === BattleSkillCondition.Dead && isAlive(actor)){
+            return;
+        }
+        dispatch(processActorSkill({ casterId: currentActorId, skillId: selectedSkill.id, targetId: actor.id }));
     }
 
     return <div className="battle" style={{backgroundImage: `url(/content/backgrounds/${background}.png)`}}>

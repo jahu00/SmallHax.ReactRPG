@@ -6,10 +6,11 @@ import { BattleActorState } from './types/battle-actor-state'
 import { BattleTeam } from 'types/battle/battle-team'
 import { BattleActorData } from 'types/battle/battle-actor-data'
 import { BattleSkillUse } from './types/battle-skill-use'
-import { BattleSkillData } from 'types/battle/battle-skill-data'
+import { BattleSkillData, BattleSkillEffect, BattleSkillCondition, BattleSkillEffectStatSource, BattleSkillEffectType, BattleSkillEffetTarget } from 'types/battle/battle-skill-data'
 import { BattleSkillState } from './types/battle-skill-state'
 import { BattleState } from './types/battle-state'
 import { BattleSkillActionType } from 'types/battle/battle-skill-action-type'
+import { getRandomItem } from 'utils/math'
 
 /*export interface BattleState {
     phase: BattlePhase
@@ -31,20 +32,20 @@ const initialState: BattleState = {
   selectedSkillId: null
 }
 
-export function toBattleSkillState(skill: BattleSkillData, index: number): BattleSkillState{
-  return {...skill, cooldown: 0, id: index};
+export function toBattleSkillState(skill: BattleSkillData, id: number): BattleSkillState{
+  return {...skill, cooldown: 0, id: id};
 }
 
 export function toBattleSkillStates(skills: BattleSkillData[]): BattleSkillState[]{
   return skills.map((x, i) => toBattleSkillState(x, i));
 }
 
-export function toBattleActorState(actor: BattleActorData, team: BattleTeam, index: number) : BattleActorState{
-  return {...actor, hp: actor.maxHp, team: team, id: index, skills: toBattleSkillStates(actor.skills)};
+export function toBattleActorState(actor: BattleActorData, team: BattleTeam, id: number, slotId: number) : BattleActorState{
+  return {...actor, hp: actor.maxHp, team: team, id: id, slotId: slotId, skills: toBattleSkillStates(actor.skills)};
 }
 
 export function toBattleActorStates(actors: BattleActorData[], team: BattleTeam, index: number): BattleActorState[]{
-  return actors.map((x, i) => toBattleActorState(x, team, index + i));
+  return actors.map((x, i) => toBattleActorState(x, team, index + i, i));
 }
 
 export function getActorTurnOrder(actors: BattleActorState[]): number[] {
@@ -64,15 +65,121 @@ export function getEnemySkillUse(actors: BattleActorState[], actorId: number): B
     throw Error(`Actor with id ${actorId} not found!`);
   }
   const oppositeTeam = actors.filter(x => x.team !== actor.team);
-  const target = oppositeTeam.find(x => x.hp > 0);
-  if (!target) {
+  const availableTargets = oppositeTeam.filter(x => isAlive(x));
+  if (!availableTargets.length) {
     throw Error(`No living member of the opposing team found!`);
   }
+  //const target = oppositeTeam.find(x => x.hp > 0);
+  // TODO: Use Min Max to select skill and target (also take into account if it's support skill or actor is taunted)
+  const target = getRandomItem(availableTargets);
   const skill = actor.skills.toSorted((a, b) => b.maxCooldown - a.maxCooldown).find(x => x.cooldown === 0);
   if (!skill) {
     throw Error(`No usable skill found!`);
   }
-  return { casterId: actor.id, skillId: skill.id, targetIds: [ target.id ] };
+  return { casterId: actor.id, skillId: skill.id, targetId: target.id };
+}
+
+export function isAlive(actor: BattleActorState): boolean {
+  return actor.hp > 0;
+}
+
+export function isDead(actor: BattleActorState): boolean {
+  return actor.hp === 0;
+}
+
+export function getTargetsForSkillEffect(skillEffect: BattleSkillEffect, actors: BattleActorState[], caster: BattleActorState, mainTarget: BattleActorState): BattleActorState[] {
+  let targets: BattleActorState[] = [];
+  for (let actor of actors) {
+    let condition = skillEffect.condition;
+    if (!condition) {
+      condition = BattleSkillCondition.Alive;
+    }
+    if (condition == BattleSkillCondition.Alive && !isAlive(actor)){
+      continue;
+    }
+    if (condition == BattleSkillCondition.Dead && !isDead(actor)){
+      continue;
+    }
+    if (skillEffect.target === BattleSkillEffetTarget.Self && actor.id != caster.id){
+      continue;
+    }
+    if ([
+          BattleSkillEffetTarget.EveryoneOtherThanSelf,
+          BattleSkillEffetTarget.AllAlliesOtherThanSelf,
+          BattleSkillEffetTarget.RandomAllyOtherThanSelf,
+    ].some(x => x === skillEffect.target) && caster.id === actor.id) {
+      continue;
+    }
+    if (skillEffect.target === BattleSkillEffetTarget.SelectedTarget && actor.id != mainTarget.id){
+      continue;
+    }
+    if ([
+          BattleSkillEffetTarget.EveryoneOtherThanTarget,
+          BattleSkillEffetTarget.AllAlliesOtherThanTarget,
+          BattleSkillEffetTarget.RandomAllyOtherThanTarget,
+          BattleSkillEffetTarget.AllOpponentsOtherThanTarget,
+          BattleSkillEffetTarget.RandomOpponentOtherThanTarget,
+    ].some(x => x === skillEffect.target) && mainTarget.id === actor.id) {
+      continue;
+    }
+    if ([
+          BattleSkillEffetTarget.AllAllies,
+          BattleSkillEffetTarget.AllAlliesOtherThanSelf,
+          BattleSkillEffetTarget.AllAlliesOtherThanTarget,
+          BattleSkillEffetTarget.RandomAlly,
+          BattleSkillEffetTarget.RandomAllyOtherThanSelf,
+          BattleSkillEffetTarget.RandomAllyOtherThanTarget,
+    ].some(x => x === skillEffect.target) && caster.team !== actor.team) {
+      continue;
+    }
+    if ([
+          BattleSkillEffetTarget.AllOpponents,
+          BattleSkillEffetTarget.AllOpponentsOtherThanTarget,
+          BattleSkillEffetTarget.RandomOpponent,
+          BattleSkillEffetTarget.RandomOpponentOtherThanTarget,
+    ].some(x => x === skillEffect.target) && caster.team === actor.team) {
+      continue;
+    }
+    if (
+        skillEffect.range !== undefined
+        && (
+          actor.team !== mainTarget.team
+          || Math.abs(mainTarget.slotId - actor.slotId) > skillEffect.range
+        )
+    ) {
+      continue;
+    }
+    targets.push(actor);
+  }
+
+  if ([
+          BattleSkillEffetTarget.RandomAlly,
+          BattleSkillEffetTarget.RandomAllyOtherThanSelf,
+          BattleSkillEffetTarget.RandomAllyOtherThanTarget,
+          BattleSkillEffetTarget.RandomOpponent,
+          BattleSkillEffetTarget.RandomOpponentOtherThanTarget,
+          BattleSkillEffetTarget.Random,
+    ].some(x => x === skillEffect.target) && targets.length > 0) {
+      const target = getRandomItem(targets);
+      targets = [target];
+    }
+    return targets;
+}
+
+export function getStat(actor: BattleActorState, statName: string): number {
+  const stats = actor as unknown as Record<string,number>;
+  const stat = stats[statName];
+  return stat;
+}
+
+export function getStatSource(statSource: BattleSkillEffectStatSource | undefined, caster: BattleActorState, target: BattleActorState): BattleActorState | undefined{
+  if (statSource === BattleSkillEffectStatSource.Caster){
+    return caster;
+  }
+  if (statSource === BattleSkillEffectStatSource.Target) {
+    return target;
+  }
+  return undefined;
 }
 
 export const battleSlice = createSlice({
@@ -143,28 +250,74 @@ export const battleSlice = createSlice({
     processActorSkill: (state, action: PayloadAction<BattleSkillUse>) => {
       const caster = state.actors[action.payload.casterId];
       const skill = caster.skills[action.payload.skillId];
-      for(let targetId of action.payload.targetIds){
-        const target = state.actors[targetId]
-        let attack = caster.attack - target.defense;
-        if (attack < 0){
-          attack = 0;
+      const mainTarget = state.actors[action.payload.targetId];
+      for(let skillStep of skill.steps) {
+        for (let skillEffect of skillStep.effects){
+          let targets = getTargetsForSkillEffect(skillEffect, state.actors, caster, mainTarget);
+          for (let target of targets){
+            let positiveStatValue = skillEffect.power ?? 0;
+            let positiveStatSource = getStatSource(skillEffect.positiveStatSource, caster, target) ?? caster;
+
+            if (positiveStatSource && skillEffect.positiveStat && positiveStatValue) {
+              positiveStatValue = positiveStatValue * getStat(positiveStatSource, skillEffect.positiveStat);
+            }
+
+            let negativeStatValue = 0;
+            let negativeStatSource = getStatSource(skillEffect.negativeStatSource, caster, target) ?? target;
+
+            if (negativeStatSource && skillEffect.negativeStat) {
+              negativeStatValue = getStat(negativeStatSource, skillEffect.negativeStat)
+            }
+
+            // TODO: Handle debuff chance and protecting against debuffs
+            let skillPower = Math.ceil(positiveStatValue - negativeStatValue);
+
+            if (skillPower < 0) {
+              skillPower = 0;
+            }
+
+            if (skillPower < 0){
+              skillPower = 0;
+            }
+            let newHp = target.hp;
+            if (skillEffect.type === BattleSkillEffectType.Damage)
+            {
+              newHp -= skillPower;
+            }
+            else if(skillEffect.type === BattleSkillEffectType.Heal)
+            {
+              newHp += skillPower;
+            }
+            if (newHp < 0){
+              newHp = 0
+            }
+            else if (newHp > target.maxHp){
+              newHp = target.maxHp;
+            }
+            if (skillEffect.cannotKill && newHp == 0){
+              newHp = 1;
+            }
+            let drain = target.hp - newHp;
+            if (drain < 0) {
+              drain = 0;
+            }
+            // TODO: Take into account passive drain and buffs
+            let drainPower = skillEffect.drainPower ?? 0;
+            if (drainPower > 1) {
+              drainPower = 1;
+            }
+            drain = Math.ceil(drain * drainPower);
+            target.hp = newHp;
+            if (drain > 0) {
+              let casterNewHp = caster.hp + drain;
+              if (casterNewHp > caster.maxHp) {
+                casterNewHp = caster.maxHp;
+              }
+              caster.hp = casterNewHp;
+            }
+          }
+
         }
-        let newHp = target.hp;
-        if (skill.actionType === BattleSkillActionType.Attack)
-        {
-          newHp -= attack;
-        }
-        else if(skill.actionType === BattleSkillActionType.Heal)
-        {
-          newHp += attack;
-        }
-        if (newHp < 0){
-          newHp = 0
-        }
-        else if (newHp > target.maxHp){
-          newHp = target.maxHp;
-        }
-        target.hp = newHp;
       }
 
       skill.cooldown = skill.maxCooldown;

@@ -1,0 +1,7 @@
+{
+    "variants": [
+        {"name": "front"},
+        {"name": "back"},
+        {"name": "dead"}
+    ]
+}

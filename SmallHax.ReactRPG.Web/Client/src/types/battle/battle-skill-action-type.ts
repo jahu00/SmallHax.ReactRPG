@@ -1,4 +1,8 @@
 export enum BattleSkillActionType {
     Attack = "attack",
-    Heal = "heal"
+    Heal = "heal",
+    Revive = "revive",
+    Support = "support",
+    Weaken = "weaken",
+    Mixed = "mixed"
 }
