@@ -1,3 +1,4 @@
+import { BattleBuffData } from "./battle-buff-data";
 import { BattleSkillActionType } from "./battle-skill-action-type";
 import { BattleSkillTargetType } from "./battle-skill-target-type";
 
@@ -25,16 +26,14 @@ export interface BattleSkillEffect {
     positiveStatSource?: BattleSkillEffectStatSource;
     negativeStat?: string;
     negativeStatSource?: BattleSkillEffectStatSource;
-    applyBuffs?: BattleSkillEffectBuff[];
-    removeBuffs?: BattleSkillEffectBuff[];
+    applyBuffs?: BattleBuffData[];
+    removeBuffs?: BattleSkillRemoveBuff[];
     cannotKill?: boolean;
 }
 
-export interface BattleSkillEffectBuff {
-    name: string;
-    power?: number;
-    duration?: number;
-    //TODO: groups, stacks, etc.
+export interface BattleSkillRemoveBuff {
+    name?: string;
+    group?: string;
 }
 
 export enum BattleSkillEffectStatSource {

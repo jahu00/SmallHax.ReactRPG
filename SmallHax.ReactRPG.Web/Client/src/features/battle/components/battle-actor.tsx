@@ -42,7 +42,7 @@ export function BattleActor({actor, orientation, selected, onClick}: BattleActor
     const handleClick = () => {
         onClick?.(actor);
     }
-    return <div className={"battle-actor " + actor.animationName} style={style}>
+    return <div className={"battle-actor " + (actor.animationName ?? "") } style={style}>
             <BattleActorSprite actorName={actor.name} pose={pose} selected={selected}/>
             <div className="click-area" onClick={handleClick}></div>
         </div>;

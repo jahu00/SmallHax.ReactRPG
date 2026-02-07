@@ -52,6 +52,24 @@
     transform: translateX(-50%);
 }
 
+.battle-buff-bar {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+}
+
+.battle-buff {
+    width: 24px;
+    height: 24px;
+    border: black 2px solid;
+    background: gray;
+}
+
+.battle-buff-icon {
+    width: 100%;
+    height: 100%;
+}
+
 .hp.progress-bar {
     border: 2px solid black;
     background: #00000077;

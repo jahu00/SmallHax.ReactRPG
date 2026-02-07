@@ -12,15 +12,8 @@ import { BattleState } from './types/battle-state'
 import { BattleSkillActionType } from 'types/battle/battle-skill-action-type'
 import { getRandomItem } from 'utils/math'
 import { BattleActorSetAnimation } from './types/battle-actor-set-animation'
-
-/*export interface BattleState {
-    phase: BattlePhase
-    round: number
-    actors: BattleActorState[]
-    turnOrder: number[]
-    turn: number
-    background: string
-}*/
+import { BattleBuffState } from './types/battle-buff-state'
+import { BattleBuffEffectType, StatModifierType } from 'types/battle/battle-buff-data'
 
 const initialState: BattleState = {
   phase: BattlePhase.NoteSet,
@@ -41,8 +34,53 @@ export function toBattleSkillStates(skills: BattleSkillData[]): BattleSkillState
   return skills.map((x, i) => toBattleSkillState(x, i));
 }
 
+export function toBattleActorStats(stats: Record<string, number>, buffs?: BattleBuffState[]): Record<string, number> {
+  let result: Record<string, number> = {};
+  for (let statName in stats){
+    let a = 1;
+    let b = 0;
+    if (buffs){
+      for (let buff of buffs){
+        const buffPower = buff.power ?? 1;
+        for (let buffEffect of buff.effects){
+          if (buffEffect.type != BattleBuffEffectType.ChangeStat){
+            continue;
+          }
+          if (buffEffect.statName !== statName){
+            continue;
+          }
+          if (buffEffect.modifierType === StatModifierType.Multiplication) {
+            a += (buffEffect.power ?? 0) * buffPower;
+          }
+          if (buffEffect.modifierType === StatModifierType.Flat) {
+            b += (buffEffect.power ?? 0) * buffPower;
+          }
+        }
+      }
+    }
+    result[statName] = Math.ceil(stats[statName] * a + b);
+  }
+  return result;
+}
+
+export function recalculateStats(actor: BattleActorState) {
+  actor.stats = toBattleActorStats(actor.baseStats, actor.buffs);
+  if (actor.hp > actor.stats.maxHp) {
+    actor.hp = actor.stats.maxHp;
+  }
+}
+
 export function toBattleActorState(actor: BattleActorData, team: BattleTeam, id: number, slotId: number) : BattleActorState{
-  return {...actor, hp: actor.maxHp, team: team, id: id, slotId: slotId, skills: toBattleSkillStates(actor.skills)};
+  return {
+    ...actor,
+    hp: actor.baseStats.maxHp,
+    team: team,
+    id: id,
+    slotId: slotId,
+    skills: toBattleSkillStates(actor.skills),
+    stats: toBattleActorStats(actor.baseStats, []),
+    buffs: []
+  };
 }
 
 export function toBattleActorStates(actors: BattleActorData[], team: BattleTeam, index: number): BattleActorState[]{
@@ -50,7 +88,7 @@ export function toBattleActorStates(actors: BattleActorData[], team: BattleTeam,
 }
 
 export function getActorTurnOrder(actors: BattleActorState[]): number[] {
-  const turnOrder = actors.map((x, i) => ({index: i, speed: x.speed}))
+  const turnOrder = actors.map((x, i) => ({index: i, speed: x.stats.speed}))
     .toSorted((a, b) => b.speed - a.speed)
     .map(x => x.index);
   return turnOrder;
@@ -168,7 +206,7 @@ export function getTargetsForSkillEffect(skillEffect: BattleSkillEffect, actors:
 }
 
 export function getStat(actor: BattleActorState, statName: string): number {
-  const stats = actor as unknown as Record<string,number>;
+  const stats: Record<string,number> = {...actor.stats, hp: actor.hp};
   const stat = stats[statName];
   return stat;
 }
@@ -205,6 +243,7 @@ export const battleSlice = createSlice({
       state.phase = BattlePhase.NextTurn;
     },
     processTurn: (state) => {
+      // TODO: Recalculate remaining turn order
       for (let actor of state.actors){
         if (actor.animationName){
           actor.animationName = undefined;
@@ -228,13 +267,21 @@ export const battleSlice = createSlice({
           return;
         }
         actor = state.actors[state.turnOrder[state.turn]];
-      } while(actor.hp == 0)
+      } while(isDead(actor))
 
       for(let skill of actor.skills) {
         if (skill.cooldown > 0){
           skill.cooldown -= 1;
         }
       }
+
+      for(let buff of actor.buffs) {
+        // TODO: Infinite buff?
+        buff.duration -= 1;
+      }
+
+      actor.buffs = actor.buffs.filter(x => x.duration > 0);
+      recalculateStats(actor);
 
       state.selectedSkillId = null;
       state.currentActorId = actor.id;
@@ -286,25 +333,36 @@ export const battleSlice = createSlice({
               skillPower = 0;
             }
             let newHp = target.hp;
-            if (skillEffect.type === BattleSkillEffectType.Damage)
-            {
+            if (skillEffect.type === BattleSkillEffectType.Damage) {
               newHp -= skillPower;
               if (target.id !== caster.id){
                 target.animationName = "hurting";
               }
             }
-            else if(skillEffect.type === BattleSkillEffectType.Heal)
-            {
+            if(skillEffect.type === BattleSkillEffectType.Heal) {
               newHp += skillPower;
               if (target.id !== caster.id){
                 target.animationName = "healing";
               }
             }
+            if(skillEffect.type === BattleSkillEffectType.Buff && skillEffect.applyBuffs) {
+              for (let buff of skillEffect.applyBuffs){
+                // TODO: compute chance to apply
+                const existingIndex = target.buffs.findIndex(x => x.group === buff.group);
+                const buffState: BattleBuffState = {...buff, duration: buff.maxDuration};
+                if (existingIndex > -1){
+                  target.buffs[existingIndex] = buffState;
+                }
+                else {
+                  target.buffs.push(buffState);
+                }
+              }
+            }
             if (newHp < 0){
               newHp = 0
             }
-            else if (newHp > target.maxHp){
-              newHp = target.maxHp;
+            else if (newHp > target.stats.maxHp){
+              newHp = target.stats.maxHp;
             }
             if (skillEffect.cannotKill && newHp == 0){
               newHp = 1;
@@ -322,11 +380,12 @@ export const battleSlice = createSlice({
             target.hp = newHp;
             if (drain > 0) {
               let casterNewHp = caster.hp + drain;
-              if (casterNewHp > caster.maxHp) {
-                casterNewHp = caster.maxHp;
+              if (casterNewHp > caster.stats.maxHp) {
+                casterNewHp = caster.stats.maxHp;
               }
               caster.hp = casterNewHp;
             }
+            recalculateStats(target);
           }
 
         }

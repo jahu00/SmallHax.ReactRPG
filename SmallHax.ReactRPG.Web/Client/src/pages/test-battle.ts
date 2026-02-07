@@ -1,3 +1,4 @@
+import { BattleBuffEffectType, StatModifierType } from "types/battle/battle-buff-data";
 import { BattleActorData } from "types/battle/battle-actor-data";
 import { BattleData } from "types/battle/battle-data";
 import { BattleSkillActionType } from "types/battle/battle-skill-action-type";
@@ -70,7 +71,18 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
                 applyBuffs: [
                     {
                         name: "shield",
-                        duration: 2
+                        background: "green",
+                        maxDuration: 2,
+                        effects: [
+                            {
+                                type: BattleBuffEffectType.ChangeStat,
+                                modifierType: StatModifierType.Multiplication,
+                                power: 0.25,
+                                statName: "defense"
+                            }
+                        ],
+                        power: 1,
+                        group: "defense"
                     }
                 ]
             };
@@ -145,10 +157,12 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
     const goblin: BattleActorData = {
         name: "goblin",
         skills: [{...attackSkill}],
-        maxHp: 10,
-        attack: 3,
-        defense: 1,
-        speed: 3
+        baseStats: {
+            maxHp: 10,
+            attack: 3,
+            defense: 1,
+            speed: 3
+        }
     };
     const elf: BattleActorData = {
         name: "elf",
@@ -156,10 +170,12 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             {...attackSkill, name: "arrow"},
             {...healSkill, name: "leaf"}
         ],
-        maxHp: 10,
-        attack: 5,
-        defense: 1,
-        speed: 5
+        baseStats: {
+            maxHp: 10,
+            attack: 5,
+            defense: 1,
+            speed: 5
+        }
     }
     const knight: BattleActorData = {
         name: "knight",
@@ -168,10 +184,12 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             {...buffSkill, name: "shield"},
             {...aoeSkill, name: "beam"},
         ],
-        maxHp: 10,
-        attack: 2,
-        defense: 2,
-        speed: 1
+        baseStats: {
+            maxHp: 10,
+            attack: 2,
+            defense: 2,
+            speed: 1
+        }
     }
     const vampire: BattleActorData = {
         name: "vampire",
@@ -179,10 +197,12 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             {...drainSkill, name: "bloody_fangs"},
             {...selfSacraficeSkill, name: "transfusion"}
         ],
-        maxHp: 7,
-        attack: 2,
-        defense: 1,
-        speed: 2
+        baseStats: {
+            maxHp: 7,
+            attack: 2,
+            defense: 1,
+            speed: 2
+        }
     }
     export const testBattle: BattleData = {
         background: "forest_2",
