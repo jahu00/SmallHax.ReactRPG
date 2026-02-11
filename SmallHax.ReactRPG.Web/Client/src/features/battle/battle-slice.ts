@@ -23,7 +23,8 @@ const initialState: BattleState = {
   turn: 0,
   background: "none",
   currentActorId: null,
-  selectedSkillId: null
+  selectedSkillId: null,
+  battleSlots: { [BattleTeam.Player]: [], [BattleTeam.Enemy]: [] }
 }
 
 export function toBattleSkillState(skill: BattleSkillData, id: number): BattleSkillState{
@@ -235,6 +236,8 @@ export const battleSlice = createSlice({
       actors = actors.concat(toBattleActorStates(action.payload.enemyTeam, BattleTeam.Enemy, actors.length));
       state.actors = actors;
       state.background = action.payload.background;
+      state.battleSlots[BattleTeam.Player] = actors.filter(x => x.team == BattleTeam.Player).map((actor, i) => ({ id: i, actorId: actor.id }));
+      state.battleSlots[BattleTeam.Enemy] = actors.filter(x => x.team == BattleTeam.Enemy).map((actor, i) => ({ id: i, actorId: actor.id }));
     },
     progressRound: (state) => {
       state.turnOrder = getActorTurnOrder(state.actors);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { DefaultSpriteData } from "types/sprite-set";
 import { useGetBattleActorSpriteSetQuery } from "../sprite-api";
 import { Point } from "types/point";
@@ -19,7 +19,7 @@ export interface BattleActorSpriteProps {
     selected?: boolean;
 }
 
-export function BattleActorSprite({actorName, pose, selected}: BattleActorSpriteProps) {
+export const BattleActorSprite = memo(function BattleActorSprite({actorName, pose, selected}: BattleActorSpriteProps) {
     const spriteSetQuery = useGetBattleActorSpriteSetQuery(actorName);
     if (spriteSetQuery.isLoading){
         return <></>;
@@ -53,4 +53,4 @@ export function BattleActorSprite({actorName, pose, selected}: BattleActorSprite
             {selected && <div className="battle-actor-selection-indicator"></div>}
             <img className="battle-actor-sprite" src={spriteFileName} style={style}/>
         </>;
-}
+});

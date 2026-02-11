@@ -26,8 +26,7 @@ export function Battle(){
     const background = useSelector((state: RootState) => state.battle.background);
     const currentActorId = useSelector((state: RootState) => state.battle.currentActorId);
     const selectedSkillId = useSelector((state: RootState) => state.battle.selectedSkillId);
-    const enemyTeam = actors.filter(x => x.team === BattleTeam.Enemy);
-    const playerTeam = actors.filter(x => x.team === BattleTeam.Player);
+    const battleSlots = useSelector((state: RootState) => state.battle.battleSlots);
     const currentActor = actors.length && currentActorId !== null ? actors[currentActorId]: null;
     const selectedSkill = selectedSkillId !== null && currentActor != null ? currentActor.skills[selectedSkillId] : null;
 
@@ -114,8 +113,8 @@ export function Battle(){
     }
 
     return <div className="battle" style={{backgroundImage: `url(/content/backgrounds/${background}.png)`}}>
-        <BattleRow actors={enemyTeam} team={BattleTeam.Enemy} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
-        <BattleRow actors={playerTeam} team={BattleTeam.Player} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
+        <BattleRow team={BattleTeam.Enemy} battleSlots={battleSlots} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
+        <BattleRow team={BattleTeam.Player} battleSlots={battleSlots} selectedActorId={currentActorId} onSlotClick={handleActorClick}/>
         <div className="battle-skills">
             {phase == BattlePhase.PlayerTurn && currentActor?.skills.map(skill => <BattleSkill skill={skill} key={skill.id} onClick={handleSkillClick} selected={skill.id === selectedSkillId}/>)}
         </div>

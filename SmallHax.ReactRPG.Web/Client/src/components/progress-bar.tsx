@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 export interface ProgressBarProps {
     min: number
@@ -7,9 +7,9 @@ export interface ProgressBarProps {
     className: string
 }
 
-export function ProgressBar({min, max, value, className}: ProgressBarProps) {
+export const ProgressBar = memo(function ProgressBar({min, max, value, className}: ProgressBarProps) {
     const progress = 100 * (value - min) / (max - min);
     return <div className={`progress-bar ${className}`}>
         <div className="progress-bar-fill" style={{width: progress + "%"}}></div>
     </div>
-}
+});
