@@ -8,7 +8,7 @@ import {
   Link
 } from "react-router";
 import { Home } from './pages/home';
-import { Adventure } from "./pages/adventure";
+import { Adventure } from "./pages/adventure-page";
 
 function App() {
   return (
