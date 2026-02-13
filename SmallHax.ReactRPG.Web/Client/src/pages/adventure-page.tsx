@@ -1,14 +1,7 @@
-import React, { useEffect } from "react";
-import { Battle } from "features/battle/components/battle";
-import { useDispatch } from "react-redux";
-import { initBattle } from "features/battle/battle-slice";
-import { testBattle } from "./test-battle";
+import React from "react";
+import { Adventure } from "features/adventure/adventure";
 
-export function Adventure() {
+export function AdventurePage() {
 
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(initBattle(testBattle));
-    }, [])
-    return <div><Battle/></div>;
+    return <div><Adventure/></div>;
 }

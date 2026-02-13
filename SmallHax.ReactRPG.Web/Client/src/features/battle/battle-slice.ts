@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { BattlePhase } from './types/battle-phase'
-import { BattleData } from 'types/battle/battle-data'
 import { BattleActorState } from './types/battle-actor-state'
 import { BattleTeam } from 'types/battle/battle-team'
 import { BattleActorData } from 'types/battle/battle-actor-data'
@@ -14,6 +13,7 @@ import { getRandomItem } from 'utils/math'
 import { BattleActorSetAnimation } from './types/battle-actor-set-animation'
 import { BattleBuffState } from './types/battle-buff-state'
 import { BattleBuffEffectType, StatModifierType } from 'types/battle/battle-buff-data'
+import { InitBattlePayload } from './types/init-battle-payload'
 
 const initialState: BattleState = {
   phase: BattlePhase.NoteSet,
@@ -85,6 +85,17 @@ export function toBattleActorState(actor: BattleActorData, team: BattleTeam, id:
 
 export function toBattleActorStates(actors: BattleActorData[], team: BattleTeam, index: number): BattleActorState[]{
   return actors.map((x, i) => toBattleActorState(x, team, index + i, i));
+}
+
+export function preparePlayerTeam(actors: BattleActorState[]): BattleActorState[]{
+  const newBuffs: BattleBuffState[] = [];
+  let result = actors.map(x => ({...x, stats: toBattleActorStats(x.baseStats, newBuffs), buffs: newBuffs}));
+  for (let actor of actors) {
+    if (actor.hp > actor.stats.maxHp) {
+      actor.hp = actor.stats.maxHp;
+    }
+  }
+  return result;
 }
 
 export function getActorTurnOrder(actors: BattleActorState[]): number[] {
@@ -225,16 +236,17 @@ export const battleSlice = createSlice({
   name: 'battle',
   initialState,
   reducers: {
-    initBattle: (state, action: PayloadAction<BattleData>) => {
+    initBattle: (state, action: PayloadAction<InitBattlePayload>) => {
+      const payload = action.payload;
       state.phase = BattlePhase.NextRound;
       state.round = 0;
       state.turn = 0;
       state.currentActorId = null;
       state.selectedSkillId = null;
-      let actors: BattleActorState[] = toBattleActorStates(action.payload.playerTeam, BattleTeam.Player, 0);
-      actors = actors.concat(toBattleActorStates(action.payload.enemyTeam, BattleTeam.Enemy, actors.length));
+      let actors: BattleActorState[] = preparePlayerTeam(payload.playerParty); //;toBattleActorStates(payload.playerParty, BattleTeam.Player, 0);
+      actors = actors.concat(toBattleActorStates(payload.battleData.enemies, BattleTeam.Enemy, actors.length));
       state.actors = actors;
-      state.background = action.payload.background;
+      state.background = payload.battleData.background;
     },
     progressRound: (state) => {
       state.turnOrder = getActorTurnOrder(state.actors);
@@ -244,6 +256,9 @@ export const battleSlice = createSlice({
     },
     processTurn: (state) => {
       // TODO: Recalculate remaining turn order
+      state.selectedSkillId = null;
+      state.currentActorId = null;
+
       for (let actor of state.actors){
         if (actor.animationName){
           actor.animationName = undefined;

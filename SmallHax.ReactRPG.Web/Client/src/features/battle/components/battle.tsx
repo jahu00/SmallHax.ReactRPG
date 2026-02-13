@@ -12,12 +12,13 @@ import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, prog
 import { BattleSkillState } from "../types/battle-skill-state";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 import { BattleSkillCondition } from "types/battle/battle-skill-data";
+import { BattleState } from "../types/battle-state";
 
 export interface BattleProps {
-    battle: BattleData
+    onBattleOver?: (phase: BattlePhase, playerParty: BattleActorState[]) => void;
 }
 
-export function Battle(){
+export function Battle({onBattleOver}: BattleProps){
     const dispatch = useDispatch();
     const phase = useSelector((state: RootState) => state.battle.phase);
     const actors = useSelector((state: RootState) => state.battle.actors);
@@ -51,8 +52,15 @@ export function Battle(){
         }
         const id = setTimeout(() => { dispatch(processTurn()); }, 500);
         return () => clearTimeout(id);
-    }, [phase, progressRound]);
+    }, [phase, processTurn]);
 
+    useEffect(() => {
+        if (phase !== BattlePhase.Won && phase !== BattlePhase.Lost){
+            return;
+        }
+        const id = setTimeout(() => { onBattleOver?.(phase, playerTeam); }, 500);
+        return () => clearTimeout(id);
+    }, [phase, playerTeam, onBattleOver]);
 
     useEffect(() => {
         if (phase !== BattlePhase.EnemyTurn){

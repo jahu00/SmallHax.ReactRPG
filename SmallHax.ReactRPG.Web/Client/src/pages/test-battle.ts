@@ -164,6 +164,18 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             speed: 3
         }
     };
+
+    const slime: BattleActorData = {
+        name: "ugly-slime",
+        skills: [{...attackSkill}],
+        baseStats: {
+            maxHp: 5,
+            attack: 2,
+            defense: 1,
+            speed: 4
+        }
+    };
+
     const elf: BattleActorData = {
         name: "elf",
         skills: [
@@ -204,8 +216,23 @@ import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
             speed: 2
         }
     }
+
+
+
     export const testBattle: BattleData = {
         background: "forest_2",
-        enemyTeam: [{...goblin}, {...goblin}, {...goblin}, {...goblin}, {...goblin}],
-        playerTeam: [knight, elf, vampire]
+        enemies: [{...goblin}, {...goblin}, {...goblin}, {...goblin}, {...goblin}],
+    }
+
+    const actors: Record<string, BattleActorData> = {
+        elf: elf,
+        knight: knight,
+        vampire: vampire,
+        goblin: goblin,
+        slime: slime
+    };
+
+    export function getTestActor(name: string): BattleActorData{
+        const actor = actors[name];
+        return {...actor};
     }
