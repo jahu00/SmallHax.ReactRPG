@@ -128,7 +128,7 @@
         #00000000
     );
     border-radius: calc(var(--battle-slot-width) / 2);
-    transform: translate(-50%, 50%) scaleY(50%) scale(var(--battle-actor-sprite-scale));
+    transform: translate(-50%, 50%) scaleY(50%) scale(var(--battle-actor-shadow-scale));
     z-index: -1;
 }
 

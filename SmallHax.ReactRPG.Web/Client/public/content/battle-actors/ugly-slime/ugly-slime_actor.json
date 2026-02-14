@@ -3,12 +3,19 @@
         "scale": 0.75,
         "anchor": {
             "x": 0.5,
-            "y": 0.90
-        }
+            "y": 0.80
+        },
+        "shadowScale": 1.5
     },
     "variants": [
         {"name": "front"},
         {"name": "back"},
-        {"name": "dead"}
+        {
+            "name": "dead",
+            "anchor": {
+                "x": 0.5,
+                "y": 0.75
+            }
+        }
     ]
 }

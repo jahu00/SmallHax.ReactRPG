@@ -3,7 +3,7 @@ import { BattleTeam } from "types/battle/battle-team";
 import { testAdventure } from "pages/test-adventure";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Battle } from "@features/battle/battle";
+import { Battle } from "features/battle/battle";
 import { BattlePhase } from "features/battle/types/battle-phase";
 import { BattleActorState } from "features/battle/types/battle-actor-state";
 

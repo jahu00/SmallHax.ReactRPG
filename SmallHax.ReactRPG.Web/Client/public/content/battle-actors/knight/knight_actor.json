@@ -1,4 +1,12 @@
 {
+    "default": {
+            "anchor": {
+            "x": 0.5,
+            "y": 0.95
+        },
+        "scale": 1,
+        "shadowScale": 1.2
+    },
     "variants": [
         {"name": "front"},
         {"name": "back"},

@@ -5,6 +5,7 @@ export interface SpriteData {
     fileName?: string;
     scale?: number;
     anchor?: Point;
+    shadowScale?: number;
 }
 export interface DefaultSpriteData extends SpriteData {
     scale: number;
