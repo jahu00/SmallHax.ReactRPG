@@ -1,18 +1,17 @@
 import React, { useEffect } from "react";
 import "assets/battle.css"
-import { BattleSkill } from "./battle-skill";
+import { BattleSkill } from "./components/battle-skill";
 import { BattleData } from "types/battle/battle-data";
 import { BattleTeam } from "types/battle/battle-team";
-import { BattleRow } from "./battle-row";
+import { BattleRow } from "./components/battle-row";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store";
-import { BattleActorState } from "../types/battle-actor-state";
-import { BattlePhase } from "../types/battle-phase";
-import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, progressRound, selectSkill, setActorAnimation } from "../battle-slice";
-import { BattleSkillState } from "../types/battle-skill-state";
+import { RootState } from "../../store";
+import { BattleActorState } from "./types/battle-actor-state";
+import { BattlePhase } from "./types/battle-phase";
+import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, progressRound, selectSkill, setActorAnimation } from "./battle-slice";
+import { BattleSkillState } from "./types/battle-skill-state";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 import { BattleSkillCondition } from "types/battle/battle-skill-data";
-import { BattleState } from "../types/battle-state";
 
 export interface BattleProps {
     onBattleOver?: (phase: BattlePhase, playerParty: BattleActorState[]) => void;
