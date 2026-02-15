@@ -1,10 +1,7 @@
 {
     "default": {
         "scale": 0.75,
-        "anchor": {
-            "x": 0.5,
-            "y": 0.80
-        },
+        "y": 0.80,
         "shadowScale": 1.5
     },
     "variants": [
@@ -12,10 +9,7 @@
         {"name": "back"},
         {
             "name": "dead",
-            "anchor": {
-                "x": 0.5,
-                "y": 0.75
-            }
+            "y": 0.75
         }
     ]
 }

@@ -4,14 +4,13 @@ export interface SpriteData {
     name: string;
     fileName?: string;
     scale?: number;
-    anchor?: Point;
+    x?: number;
+    y?: number;
     shadowScale?: number;
+    shadowMass?: number;
 }
-export interface DefaultSpriteData extends SpriteData {
-    scale: number;
-    anchor: Point;
-}
+
 export interface SpriteSet {
-    default?: DefaultSpriteData;
+    default?: SpriteData;
     variants: SpriteData[];
 }

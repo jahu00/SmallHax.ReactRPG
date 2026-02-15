@@ -1,17 +1,16 @@
 import React from "react";
-import { DefaultSpriteData } from "types/sprite-set";
 import { useGetBattleActorSpriteSetQuery } from "../sprite-api";
 import { Point } from "types/point";
 import { BattleActorShadow } from "./battle-actor-shadow";
+import { SpriteData } from "types/sprite-set";
 
-const _defaultSpriteData: DefaultSpriteData = {
+const _defaultSpriteData: SpriteData = {
     name: "default",
-    anchor: {
-        x: 0.5,
-        y: 0.95
-    },
+    x: 0.5,
+    y: 0.95,
     scale: 1,
     shadowScale: 1,
+    shadowMass: 0.2,
     fileName: "/content/battle-actors/default.png"
 };
 
@@ -28,16 +27,15 @@ export function BattleActorSprite({actorName, pose, selected}: BattleActorSprite
     }
     const spriteData = spriteSetQuery.data?.variants.find(x => x.name == pose);
     const defaultSpriteData = spriteSetQuery.data?.default ?? _defaultSpriteData;
-    const anchor: Point = {
-        x: spriteData?.anchor?.x ?? defaultSpriteData.anchor.x,
-        y: spriteData?.anchor?.y ?? defaultSpriteData.anchor.y,
-    };
-    const shadowScale = spriteData?.shadowScale ?? defaultSpriteData.shadowScale ?? 1;
-    const scale = spriteData?.scale ?? defaultSpriteData.scale;
+    const x = spriteData?.x ?? defaultSpriteData.x ?? (_defaultSpriteData.x as number);
+    const y = spriteData?.y ?? defaultSpriteData.y ?? (_defaultSpriteData.y as number);
+    const shadowScale = spriteData?.shadowScale ?? defaultSpriteData.shadowScale ?? (_defaultSpriteData.shadowScale as number);
+    const shadowMass = spriteData?.shadowMass ?? defaultSpriteData.shadowMass ?? (_defaultSpriteData.shadowMass as number);
+    const scale = spriteData?.scale ?? defaultSpriteData.scale ?? (_defaultSpriteData.scale as number);
     const style = {
         "--battle-actor-sprite-scale": (scale * 100) + "%",
-        "--battle-actor-sprite-offset-x": (-100 * anchor.x).toFixed(2) + "%",
-        "--battle-actor-sprite-offset-y": (100 - anchor.y * 100).toFixed(2) + "%",
+        "--battle-actor-sprite-offset-x": (-100 * x).toFixed(2) + "%",
+        "--battle-actor-sprite-offset-y": (100 - y * 100).toFixed(2) + "%",
     } as React.CSSProperties;
     let spriteFileName = spriteData?.fileName;
     if (spriteFileName)
@@ -52,7 +50,7 @@ export function BattleActorSprite({actorName, pose, selected}: BattleActorSprite
         spriteFileName = defaultSpriteData.fileName;
     }
     return <>
-            <BattleActorShadow scale={shadowScale} />
+            <BattleActorShadow scale={shadowScale} mass={shadowMass} />
             {selected && <div className="battle-actor-selection-indicator"></div>}
             <img className="battle-actor-sprite" src={spriteFileName} style={style}/>
         </>;
