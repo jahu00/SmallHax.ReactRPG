@@ -12,14 +12,15 @@ import { getEnemySkillUse, isAlive, isDead, processActorSkill, processTurn, prog
 import { BattleSkillState } from "./types/battle-skill-state";
 import { BattleSkillTargetType } from "types/battle/battle-skill-target-type";
 import { BattleSkillCondition } from "types/battle/battle-skill-data";
+import { useBattle } from "./hooks/use-battle";
 
 export interface BattleProps {
-    onBattleOver?: (phase: BattlePhase, playerParty: BattleActorState[]) => void;
+    onBattleWon?: (playerParty: BattleActorState[]) => void;
+    onBattleLost?: () => void;
 }
 
-export function Battle({onBattleOver}: BattleProps){
+export function Battle({onBattleWon, onBattleLost}: BattleProps){
     const dispatch = useDispatch();
-    const phase = useSelector((state: RootState) => state.battle.phase);
     const actors = useSelector((state: RootState) => state.battle.actors);
     const turn = useSelector((state: RootState) => state.battle.turn);
     const turnOrder = useSelector((state: RootState) => state.battle.turnOrder);
@@ -28,6 +29,10 @@ export function Battle({onBattleOver}: BattleProps){
     const selectedSkillId = useSelector((state: RootState) => state.battle.selectedSkillId);
     const enemyTeam = actors.filter(x => x.team === BattleTeam.Enemy);
     const playerTeam = actors.filter(x => x.team === BattleTeam.Player);
+    const handleBattleWon = () => {
+        onBattleWon?.(playerTeam);
+    }
+    const {phase} = useBattle({onBattleLost: onBattleLost, onBattleWon: handleBattleWon});
     const currentActor = actors.length && currentActorId !== null ? actors[currentActorId]: null;
     const selectedSkill = selectedSkillId !== null && currentActor != null ? currentActor.skills[selectedSkillId] : null;
 
@@ -52,14 +57,6 @@ export function Battle({onBattleOver}: BattleProps){
         const id = setTimeout(() => { dispatch(processTurn()); }, 500);
         return () => clearTimeout(id);
     }, [phase, processTurn]);
-
-    useEffect(() => {
-        if (phase !== BattlePhase.Won && phase !== BattlePhase.Lost){
-            return;
-        }
-        const id = setTimeout(() => { onBattleOver?.(phase, playerTeam); }, 500);
-        return () => clearTimeout(id);
-    }, [phase, playerTeam, onBattleOver]);
 
     useEffect(() => {
         if (phase !== BattlePhase.EnemyTurn){

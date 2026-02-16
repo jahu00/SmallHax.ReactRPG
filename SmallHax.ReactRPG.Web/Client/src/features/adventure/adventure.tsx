@@ -1,7 +1,7 @@
 import { initBattle, toBattleActorStates } from "features/battle/battle-slice";
 import { BattleTeam } from "types/battle/battle-team";
 import { testAdventure } from "pages/test-adventure";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Battle } from "features/battle/battle";
 import { BattlePhase } from "features/battle/types/battle-phase";
@@ -22,11 +22,14 @@ export function Adventure() {
         const playerParty = toBattleActorStates(adventureData.playerParty, BattleTeam.Player, 0);
         dispatch(initBattle({battleData: adventureData.stages[stageId], playerParty: playerParty}));
     }, [adventureData, stageId]);
-    const handleBattleOver = (phase: BattlePhase, playerParty: BattleActorState[]) => {
-        if (phase === BattlePhase.Lost){
-            // TODO: Handle battle lost
-            return;
-        }
+
+    const handleBattleLost = useCallback(() => {
+        // TODO: Handle battle lost
+        return;
+    }, []);
+
+
+    const handleBattleWon = useCallback((playerParty: BattleActorState[]) => {
         const newStageId = stageId + 1;
         setStageId(newStageId);
         if (newStageId < adventureData.stages.length)
@@ -35,6 +38,6 @@ export function Adventure() {
         } else {
             // TODO: Handle adventure won
         }
-    }
-    return <div><Battle onBattleOver={handleBattleOver}/></div>;
+    }, [stageId, adventureData])
+    return <div><Battle onBattleLost={handleBattleLost} onBattleWon={handleBattleWon}/></div>;
 }
